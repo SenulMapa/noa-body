@@ -1,0 +1,5 @@
+# Real Halo hardware (host app over Bluetooth LE):
+brilliant-sdk        # meta-package: pulls in brilliant-ble + brilliant-msg
+
+# Testing WITHOUT a Halo uses the experimental Python emulator, which is not on
+# PyPI — install it editable from the SDK repo. See README → "Test without a Halo".
