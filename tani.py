@@ -23,6 +23,10 @@ import urllib.request
 
 TANI_API = os.environ.get("TANI_API")  # e.g. https://api.tani.dev — unset = demo mode
 
+# A real User-Agent: WAFs (Cloudflare etc.) reject the default "Python-urllib/x"
+# with a 403, so requests must look like a real client.
+USER_AGENT = "noa-body/0.1 (+https://github.com/SenulMapa/noa-body)"
+
 FAKE_STEPS = [
     "understanding the request",
     "planning the approach",
@@ -88,7 +92,7 @@ def _guest_token():
 
 def _post_json(url, body=None, token=None):
     payload = json.dumps(body or {}).encode()
-    headers = {"Content-Type": "application/json"}
+    headers = {"Content-Type": "application/json", "User-Agent": USER_AGENT}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(url, data=payload, headers=headers)
@@ -103,6 +107,7 @@ def _sse_post(url, body, token):
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
         "Accept": "text/event-stream",
+        "User-Agent": USER_AGENT,
     })
     with urllib.request.urlopen(req, timeout=600) as r:
         for raw in r:

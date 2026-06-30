@@ -19,9 +19,11 @@ TANI work on the lens. No web mock — real glasses (or the Python emulator).
 
 ![TANI status streaming to the Halo display](demo.gif)
 
-> **Verified:** the frames above are real output from Brilliant's experimental
-> Python emulator running `app.py` end-to-end. The same code targets a real Halo
-> over BLE — that's the one-line swap in `make_frame()`.
+> **Verified, live.** The frames above are real output from **live production
+> TANI** (a real agent doing a real web search) streamed to Brilliant's Python
+> emulator running `app.py` end-to-end. No signup — `app.py` mints an ephemeral
+> guest token against `https://tani.senulmapa.com/api`. The same code targets a
+> real Halo over BLE: the only difference is the one-line swap in `make_frame()`.
 
 ## Run it on your Halo
 ```bash
@@ -57,10 +59,16 @@ TANI run and funnel whatever it emits (structured events / raw text / final
 answer) through `on_status({step, status, summary, progress})`. `hud.py` doesn't
 care how TANI works, only that it gets status.
 
-## Guest access — let Brilliant try real TANI with no signup
-Set `TANI_API` and `tani.py` runs a real TANI task via an **ephemeral guest
-token**: no account, and no secret ever stored in this repo. It's minted per run
-and expires in minutes. TANI's backend implements two endpoints:
+## Guest access — try real TANI now, no signup
+**It's live** at `https://tani.senulmapa.com/api`. Run a real TANI task on the
+emulator with one command — `app.py` mints an **ephemeral guest token** (no
+account, no secret in this repo, minted per run, expires in minutes):
+```bash
+TANI_API=https://tani.senulmapa.com/api python app.py --emulator "compare the gdp of japan and germany"
+```
+Unset `TANI_API` → offline demo steps, so a fresh clone still runs with zero backend.
+
+The backend implements two endpoints:
 
 ```
 POST /guest
@@ -75,12 +83,6 @@ POST /run     (header: Authorization: Bearer <token>)
       …
       data: {"status":"done","summary":"<final headline>","progress":1.0}
 ```
-
-Run against it (no signup, secret never touches the repo):
-```bash
-TANI_API=https://api.tani.example python app.py --emulator "build me a landing page"
-```
-Unset `TANI_API` → offline demo steps, so a fresh clone runs with zero backend.
 
 **Security:** the repo holds no token. Guests are minted on demand, expire fast,
 and are rate-limited + scoped server-side — so the public URL can't be abused
